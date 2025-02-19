@@ -1,0 +1,154 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Togetherly</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" >
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+            </div>
+            <span class="logo-text">Togetherly</span>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="Search...">
+              <button class="search-btn">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+        </div>
+        <div class="nav-links">
+            <div class="nav-item">
+                <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> Register</a>
+            </div>
+            <div class="nav-item">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <!-- <div class="nav-item">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user-friends"></i> My Network
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-briefcase"></i> Jobs
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-comment-dots"></i> Messaging
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-bell"></i> Notifications
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i> Me 
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-th"></i> For Business
+            </div> -->
+        </div>
+    </div>
+
+    <main class="main-content">
+        <!-- Left Sidebar -->
+        <div class="profile-section">
+            <div class="profile-card">
+                <div class="profile-cover"></div>
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="profile-name">Login to make your profile</h2>
+                    <p class="profile-headline"></p>
+                    <div class="mood-indicator">
+                        <span class="mood-emoji">😊</span>
+                        <span>Feeling productive today!</span>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span>Profile views</span>
+                        <span>0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Post impressions</span>
+                        <span>0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Feed -->
+        <div class="feed-section">
+            <div class="create-post">
+                <div class="post-input">
+                    <div class="post-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="post-textbox">
+                        <input type="text" placeholder="Share what you're working on...">
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <div class="post-action">
+                        <i class="fa-solid fa-image"></i>
+                        <label for="pic">Photo </label>
+                        <input type="file" id="pic" style="visibility: hidden;">
+                    </div>
+                    <div class="post-action">📅 Event</div>
+                    <div class="post-action">📝 Write Article</div>
+                </div>
+            </div>
+
+        <!-- Trending section  -->
+        <div class="news-section">
+            <h1 class="news-header">Trending</h1>
+            <div class="news-card">
+                <div class="news-item">
+                    <div class="news-title">New Framework Released</div>
+                    <div class="news-meta">1,234 developers discussing</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Tech Conference 2024</div>
+                    <div class="news-meta">500+ attending</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Remote Work Trends</div>
+                    <div class="news-meta">2,345 reactions</div>
+                </div>
+            </div>
+            <div class="news-card">
+                <div class="news-item">
+                    <div class="news-title">New Framework Released</div>
+                    <div class="news-meta">1,234 developers discussing</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Tech Conference 2024</div>
+                    <div class="news-meta">500+ attending</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Remote Work Trends</div>
+                    <div class="news-meta">2,345 reactions</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>
