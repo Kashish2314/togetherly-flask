@@ -25,6 +25,37 @@ function applySavedTheme() {
 }
 applySavedTheme();
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add menu icon to navbar
+    const navbar = document.querySelector('.navbar');
+    const menuIcon = document.createElement('div');
+    menuIcon.className = 'menu-icon';
+    menuIcon.innerHTML = '<i class="fas fa-bars"></i>';
+    navbar.insertBefore(menuIcon, navbar.firstChild);
+
+    // Menu toggle functionality
+    const navLinks = document.querySelector('.nav-links');
+    const searchContainer = document.querySelector('.search-container');
+    
+    menuIcon.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        searchContainer.classList.toggle('active');
+        menuIcon.innerHTML = navLinks.classList.contains('active') 
+            ? '<i class="fas fa-times"></i>' 
+            : '<i class="fas fa-bars"></i>';
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.navbar')) {
+            navLinks.classList.remove('active');
+            searchContainer.classList.remove('active');
+            menuIcon.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
+});
+
 // Automatically hide flash messages after 2 seconds
 const flashMessages = document.querySelectorAll('.flash');
 flashMessages.forEach(message => {

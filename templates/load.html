@@ -14,6 +14,12 @@
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
         }
 
         .container {
@@ -91,9 +97,29 @@
                 transform: scaleX(1);
             }
         }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #0077b5;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" id="themeToggle" style="visibility: hidden;">🌓</button>
+
     <div class="container">
         <div class="logo">
             <div class="logo-icon">
@@ -109,6 +135,27 @@
     </div>
 
     <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        // Function to toggle theme and save preference
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            // Save the current theme preference in localStorage
+            const currentTheme = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+            localStorage.setItem('theme', currentTheme);
+        });
+        // Function to apply the saved theme on page load
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark-mode') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        applySavedTheme();
+
+        // Redirect after 4 seconds
         setTimeout(() => {
             window.location.href = "{{ url_for('home') }}";
         }, 4000);

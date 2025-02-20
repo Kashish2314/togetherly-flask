@@ -16,6 +16,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
     <div class="navbar">
         <div class="logo">
             <div class="logo-icon">
@@ -27,17 +28,20 @@
         </div>
         <div class="search-container">
             <div class="search-box">
-              <input type="text" class="search-input" placeholder="Search...">
-              <button class="search-btn">
-                <i class="fas fa-search"></i>
-              </button>
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
         <div class="nav-links">
             {% if 'user_id' in session %}
                 <!-- Show profile and logout options if user is logged in -->
                 <div class="nav-item">
-                    <a href="#"><i class="fas fa-user"></i> {{ user.username }}</a>
+                    <a href="#"><i class="fas fa-home"></i> Home</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#"><i class="fas fa-user"></i> {{user.username}}</a>
                 </div>
                 <div class="nav-item">
                     <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -116,21 +120,76 @@
                 </div>
             </div>
 
-        <!-- Trending section  -->
-        <div class="news-section">
-            <h1 class="news-header">Trending</h1>
-            <div class="news-card">
-                <div class="news-item">
-                    <div class="news-title">New Framework Released</div>
-                    <div class="news-meta">1,234 developers discussing</div>
-                </div>
-                <div class="news-item">
-                    <div class="news-title">Tech Conference 2024</div>
-                    <div class="news-meta">500+ attending</div>
-                </div>
-                <div class="news-item">
-                    <div class="news-title">Remote Work Trends</div>
-                    <div class="news-meta">2,345 reactions</div>
+            <!-- Trending section  -->
+            <div class="news-section">
+                <h2 class="news-header">Trending News</h2>
+                <div class="news-card">
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://neontri.com/blog/claude-ai-breakthrough/#:~:text=After%20testing%20the%20models%20on,material%20to%20verify%20the%20answers.">
+                                Claude 3 Surpasses Human Performance on Advanced Reasoning Tasks
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-fire"></i>
+                            <span>15.2K developers discussing</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://searchengineland.com/google-imagen-3-ai-model-human-subjects-ads-452120">
+                                Google Introduces Next-Gen AI Image Generator
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-chart-line"></i>
+                            <span>8.7K shares</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://medium.com/@ilhnsevval/openais-latest-innovations-multimodal-capabilities-and-assistants-api-901a02cc344f">
+                                OpenAI's Latest Innovation in Multimodal Learning
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-comments"></i>
+                            <span>12.3K reactions</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://about.gitlab.com/topics/devops/ai-code-generation-guide/">
+                                AI-Powered Code Generation Transforms Developer Workflow
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-code"></i>
+                            <span>6.5K developers implementing</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://techcrunch.com/2025/02/20/ceo-of-clearview-ai-a-controversial-facial-recognition-startup-has-resigned/">
+                                CEO of Clearview AI, a controversial facial recognition startup, has resigned
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-user-lock"></i>
+                            <span>Clearview AI faces multiple privacy suits</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">
+                            <a href="https://timesofindia.indiatimes.com/technology/tech-news/swedish-pm-has-an-ai-warning-for-europe-region-will-actually-become-some-kind-of/articleshow/118424150.cms">
+                                Swedish PM has an ‘AI warning’ for Europe: Region ‘will actually become some kind of…’
+                            </a>
+                        </div>
+                        <div class="news-meta">
+                            <i class="fas fa-globe"></i>
+                            <span>Europe urged to ease AI regulations</span>
+                        </div>
+                    </div>                
                 </div>
             </div>
         </div>
