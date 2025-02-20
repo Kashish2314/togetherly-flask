@@ -3,10 +3,27 @@ document.querySelector('.search-btn').addEventListener('click', function() {
     document.querySelector('.search-input').focus();
 });
 
+// theme toggle
 const themeToggle = document.getElementById('themeToggle');
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-});
+// Function to toggle theme and save preference
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        // Save the current theme preference in localStorage
+        const currentTheme = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+        localStorage.setItem('theme', currentTheme);
+    });
+}
+// Function to apply the saved theme on page load
+function applySavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark-mode') {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+}
+applySavedTheme();
 
 // Automatically hide flash messages after 2 seconds
 const flashMessages = document.querySelectorAll('.flash');
