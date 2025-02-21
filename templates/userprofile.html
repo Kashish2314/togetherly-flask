@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Togetherly - Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/userprofile.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+            </div>
+            <span class="logo-text">Togetherly</span>
+        </div>
+        <div class="nav-links">
+            <button class="theme-toggle" id="themeToggle" style="visibility: hidden;">🌓</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-background"></div>
+            <div class="profile-info">
+                <div class="profile-picture-container">
+                    <div class="profile-picture">
+                        <img id="profileImage" src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg" alt="Profile picture">
+                    </div>
+                    <div class="edit-avatar-icon" id="editAvatar">✏️</div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn" id="editProfile">Edit profile</button>
+                    <button class="btn btn-danger" id="deleteAccount" onclick="deleteAccount()">Delete account</button>
+                </div>
+                <div class="profile-details">
+                    <h1 class="profile-name" id="displayName">{{ user.first_name }} {{ user.last_name }}</h1>
+                    <div class="profile-headline" id="displayUsername">@{{ user.username }}</div>
+                    <div class="profile-location" id="displayEmail">{{ user.email }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Connections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Projects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Following</div>
+            </div>
+        </div>
+
+        <!-- Bio Section -->
+        <div class="bio-section" id="bioSection" >
+            <div class="bio-header">
+                <h3>About</h3>
+                <button class="btn" id="editBio">Edit</button>
+            </div>
+            <div class="bio-content" id="bioContent">
+                {% if user_profile and user_profile.bio %}{{ user_profile.bio }}{% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="skills-section" id="skillsSection">
+            <h3>Skills</h3>
+            <div class="skills-container" id="skillsContainer">
+                {% if user_profile and user_profile.skills %}
+                    {% for skill in user_profile.skills.split(',') %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Activity Feed (Hidden by Default) -->
+        <div class="activity-feed" id="activitySection" style="display: none;">
+            <h3>Recent Activity</h3>
+            <div class="activity-items" id="activityItems"></div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Profile</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form action="{{ url_for('update_profile') }}" method="POST">
+                <div class="form-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" name="name" value="{{ user.first_name }} {{ user.last_name }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" name="username" value="{{ user.username }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" name="email" value="{{ user.email }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editBioText">Bio</label>
+                    <textarea id="editBioText" name="bio">{% if user_profile and user_profile.bio %}{{ user_profile.bio }}{% endif %}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editSkills">Skills (comma-separated)</label>
+                    <input type="text" id="editSkills" name="skills" value="{% if user_profile and user_profile.skills %}{{ user_profile.skills }}{% endif %}">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" id="cancelEdit" type="button">Cancel</button>
+                    <button class="btn" id="saveProfile" type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const currentTheme = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+                localStorage.setItem('theme', currentTheme);
+            });
+        }
+
+        // Apply saved theme on page load
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark-mode') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        applySavedTheme();
+
+        // Profile picture upload
+        const profileImage = document.getElementById('profileImage');
+        const editAvatar = document.getElementById('editAvatar');
+        editAvatar.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        profileImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+
+        // Edit Profile Modal
+        const modal = document.getElementById('editProfileModal');
+        const editProfileBtn = document.getElementById('editProfile');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelEditBtn = document.getElementById('cancelEdit');
+        const saveProfileBtn = document.getElementById('saveProfile');
+        const editBioBtn = document.getElementById('editBio');
+
+        // Open modal
+        editProfileBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        cancelEditBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Delete account
+        cancelEditBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Delete account
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                fetch("{{ url_for('delete_account') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

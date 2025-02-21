@@ -24,6 +24,16 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+# Define the UserProfile model
+class UserProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    bio = db.Column(db.String(500), nullable=True)
+    skills = db.Column(db.String(500), nullable=True)
+
+    def __repr__(self):
+        return f'<UserProfile {self.user_id}>'
+
 # Create database tables
 with app.app_context():
     db.create_all()
@@ -96,6 +106,81 @@ def register():
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
+
+# User Profile Route
+@app.route('/user_profile')
+def user_profile():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to view your profile.', 'error')
+        return redirect(url_for('login'))
+
+    # Fetch the logged-in user's data
+    user = User.query.get(session['user_id'])
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('home'))
+
+    # Fetch the user's profile data
+    user_profile = UserProfile.query.filter_by(user_id=user.id).first()
+
+    # Render the user profile page with the user's data
+    return render_template('userprofile.html', user=user, user_profile=user_profile)
+
+# Route to Handle Profile Updates
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'user_id' not in session:
+        flash('Please log in to update your profile.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('home'))
+
+    # Get form data
+    bio = request.form.get('bio')
+    skills = request.form.get('skills')
+
+    # Fetch or create the user's profile
+    user_profile = UserProfile.query.filter_by(user_id=user.id).first()
+    if not user_profile:
+        user_profile = UserProfile(user_id=user.id)
+        db.session.add(user_profile)
+
+    # Update profile data
+    user_profile.bio = bio
+    user_profile.skills = skills
+    db.session.commit()
+
+    flash('Profile updated successfully!', 'success')
+    return redirect(url_for('user_profile'))
+
+# Delete Profile Route
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    if 'user_id' not in session:
+        flash('Please log in to delete your account.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('home'))
+
+    # Delete the user's profile data
+    UserProfile.query.filter_by(user_id=user.id).delete()
+
+    # Delete the user
+    db.session.delete(user)
+    db.session.commit()
+
+    # Clear the session
+    session.pop('user_id', None)
+
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('home'))
 
 # Logout Route
 @app.route('/logout')
