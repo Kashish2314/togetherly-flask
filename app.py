@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
@@ -34,11 +33,6 @@ class UserProfile(db.Model):
     email = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.String(500), nullable=True)
     skills = db.Column(db.String(500), nullable=True)
-    following = db.Column(db.Integer, default=0)
-    connections = db.Column(db.Integer, default=0)
-    projects = db.Column(db.Integer, default=0)
-    posts = db.Column(db.Integer, default=0)
-    profile_picture = db.Column(db.String(500), nullable=True)  # Store the file path or URL
 
     def __repr__(self):
         return f'<UserProfile {self.user_id}>'
@@ -144,18 +138,6 @@ def user_profile():
         app.logger.error(f"Error in user_profile route: {e}")
         return "An error occurred while loading the profile page.", 500
 
-# Configure upload folder and allowed extensions
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure the upload folder exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 # Route to Handle Profile Updates
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
@@ -172,20 +154,6 @@ def update_profile():
     email = request.form.get('email')
     bio = request.form.get('bio')
     skills = request.form.get('skills')
-    following = request.form.get('following', type=int)
-    connections = request.form.get('connections', type=int)
-    projects = request.form.get('projects', type=int)
-    posts = request.form.get('posts', type=int)
-
-    # Handle profile picture upload
-    profile_picture = request.files.get('profile_picture')
-    profile_picture_path = None
-    if profile_picture and allowed_file(profile_picture.filename):
-        # Save the file to the upload folder
-        filename = secure_filename(f"user_{user.id}_{profile_picture.filename}")
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        profile_picture.save(filepath)
-        profile_picture_path = os.path.join('uploads', filename)
 
     # Fetch or create the user's profile
     user_profile = UserProfile.query.filter_by(user_id=user.id).first()
@@ -199,12 +167,6 @@ def update_profile():
     user_profile.email = email
     user_profile.bio = bio
     user_profile.skills = skills
-    user_profile.following = following
-    user_profile.connections = connections
-    user_profile.projects = projects
-    user_profile.posts = posts
-    if profile_picture_path:
-        user_profile.profile_picture = profile_picture_path
 
     db.session.commit()
 
@@ -217,13 +179,7 @@ def update_profile():
         'email': email,
         'bio': bio,
         'skills': skills,
-        'following': following,
-        'connections': connections,
-        'projects': projects,
-        'posts': posts,
-        'profile_picture': profile_picture_path
     })
-
 
 # Delete Profile Route
 @app.route('/delete_account', methods=['POST'])
@@ -232,24 +188,32 @@ def delete_account():
         flash('Please log in to delete your account.', 'error')
         return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
-    if not user:
-        flash('User not found.', 'error')
+    try:
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('home'))
+
+        # Delete the user's profile data first (to avoid foreign key constraint violations)
+        UserProfile.query.filter_by(user_id=user_id).delete()
+        
+        # Now delete the user
+        db.session.delete(user)
+        db.session.commit()
+        
+        # Clear the session
+        session.clear()
+        
+        flash('Your account has been deleted successfully.', 'success')
         return redirect(url_for('home'))
-
-    # Delete the user's profile data
-    UserProfile.query.filter_by(user_id=user.id).delete()
-
-    # Delete the user
-    db.session.delete(user)
-    db.session.commit()
-
-    # Clear the session
-    session.pop('user_id', None)
-
-    flash('Your account has been deleted.', 'success')
-    return redirect(url_for('home'))
-
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error deleting account: {e}")
+        flash('An error occurred while deleting your account.', 'error')
+        return redirect(url_for('home'))
+    
 # Logout Route
 @app.route('/logout')
 def logout():
