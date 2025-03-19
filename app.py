@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -36,6 +37,16 @@ class UserProfile(db.Model):
 
     def __repr__(self):
         return f'<UserProfile {self.user_id}>'
+
+# Define the Post model
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.String(500), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Post {self.id}>'
 
 # Create database tables
 with app.app_context():
@@ -213,7 +224,70 @@ def delete_account():
         app.logger.error(f"Error deleting account: {e}")
         flash('An error occurred while deleting your account.', 'error')
         return redirect(url_for('home'))
-    
+
+# Route to create a new post
+@app.route('/create_post', methods=['POST'])
+def create_post():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Please log in to create a post.'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found.'}), 404
+
+    content = request.form.get('content')
+    if not content:
+        return jsonify({'success': False, 'message': 'Post content cannot be empty.'}), 400
+
+    new_post = Post(user_id=user.id, content=content)
+    db.session.add(new_post)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'message': 'Post created successfully!',
+        'post': {
+            'id': new_post.id,
+            'content': new_post.content,
+            'timestamp': new_post.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            'username': user.username,
+            'user_id': user.id
+        }
+    })
+
+# Route to fetch all posts
+@app.route('/get_posts')
+def get_posts():
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    post_list = []
+    for post in posts:
+        user = User.query.get(post.user_id)
+        post_list.append({
+            'id': post.id,
+            'content': post.content,
+            'timestamp': post.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            'username': user.username,
+            'user_id': user.id
+        })
+    return jsonify({'success': True, 'posts': post_list})
+
+# Route to delete a post
+@app.route('/delete_post/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Please log in to delete a post.'}), 401
+
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'success': False, 'message': 'Post not found.'}), 404
+
+    if post.user_id != session['user_id']:
+        return jsonify({'success': False, 'message': 'You can only delete your own posts.'}), 403
+
+    db.session.delete(post)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Post deleted successfully!'})
+
 # Logout Route
 @app.route('/logout')
 def logout():

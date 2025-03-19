@@ -100,25 +100,37 @@
 
         <!-- Main Feed -->
         <div class="feed-section">
+            <!-- Post Section -->
             <div class="create-post">
+                <input type="hidden" id="createPostUrl" value="{{ url_for('create_post') }}">
+                <input type="hidden" id="getPostsUrl" value="{{ url_for('get_posts') }}">
+                <input type="hidden" id="currentUserId" value="{{ session.get('user_id', 0) }}"> <!-- Add this line -->
                 <div class="post-input">
                     <div class="post-avatar">
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="post-textbox">
-                        <input type="text" placeholder="Share what you're working on...">
+                        <input type="text" id="postContent" placeholder="Share what you're working on...">
                     </div>
                 </div>
                 <div class="post-actions">
                     <div class="post-action">
                         <i class="fas fa-image"></i>
-                        <label for="pic">Photo </label>
-                        <input type="file" id="pic" style="visibility: hidden;">
+                        <label for="postImage">Photo</label>
+                        <input type="file" id="postImage" style="visibility: hidden;">
                     </div>
                     <div class="post-action">📅 Event</div>
                     <div class="post-action">📝 Write Article</div>
+                    <button class="post-action" id="submitPost">Post</button> <!-- Submit button -->
                 </div>
             </div>
+            
+            <!-- Posts Feed -->
+            <div class="posts-feed" id="postsFeed">
+                <div id="loading" style="display: none;">Loading posts...</div>
+                <!-- Posts will be dynamically inserted here -->
+            </div>
+
 
             <!-- Trending section  -->
             <div class="news-section">

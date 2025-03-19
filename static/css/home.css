@@ -204,6 +204,8 @@ body {
 
 .nav-item a:hover::after {
     width: 100%;
+    color: var(--primary-color);
+    transform: scale(1.1);
 }
 
 button {
@@ -444,6 +446,36 @@ button:hover {
 .post-action:hover {
     background: var(--hover-bg);
     border-radius: 1rem;
+}
+
+.post {
+    border: 1px solid red; /* Temporary border for debugging */
+    margin-bottom: 10px;
+    padding: 10px;
+    background: white; /* Ensure posts are visible */
+}
+
+/* Loading indicator */
+#loading {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* No posts message */
+.no-posts {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Error message */
+.error {
+    text-align: center;
+    color: #ff4d4d;
+    padding: 20px;
 }
 
 /* Unique Features */
