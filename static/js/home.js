@@ -69,64 +69,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
    // Function to load posts
    function loadPosts() {
-       console.log('Loading posts...'); // Log when the function starts
-       loading.style.display = 'block'; // Show loading indicator
+    console.log('Loading posts...'); // Log when the function starts
+    loading.style.display = 'block'; // Show loading indicator
 
-       fetch(getPostsUrl)
-           .then(response => {
-               console.log('Fetch response:', response); // Log the fetch response
-               if (!response.ok) {
-                   throw new Error('Failed to fetch posts');
-               }
-               return response.json();
-           })
-           .then(data => {
-               console.log('Response Data:', data); // Log the response data
-               if (data.success) {
-                   console.log('Posts fetched successfully:', data.posts); // Log the posts
-                   postsFeed.innerHTML = ''; // Clear existing posts
-                   if (data.posts.length === 0) {
-                       console.log('No posts available.'); // Log if there are no posts
-                       postsFeed.innerHTML = '<div class="no-posts">No posts available. Be the first to share something!</div>';
-                   } else {
-                       console.log('Displaying posts...'); // Log before displaying posts
-                       data.posts.forEach(post => {
-                           const postElement = document.createElement('div');
-                           postElement.className = 'post';
-                           postElement.innerHTML = `
-                               <div class="post-header">
-                                   <span class="post-username">${post.username}</span>
-                                   <span class="post-timestamp">${post.timestamp}</span>
-                                   ${post.user_id === currentUserId ? 
-                                       `<button class="delete-post" data-post-id="${post.id}">Delete</button>` : ''
-                                   }
-                               </div>
-                               <div class="post-content">${post.content}</div>
-                           `;
-                           postsFeed.appendChild(postElement);
-                       });
+    fetch(getPostsUrl)
+        .then(response => {
+            console.log('Fetch response:', response); // Log the fetch response
+            if (!response.ok) {
+                throw new Error('Failed to fetch posts');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data); // Log the response data
+            if (data.success) {
+                console.log('Posts fetched successfully:', data.posts); // Log the posts
+                postsFeed.innerHTML = ''; // Clear existing posts
+                if (data.posts.length === 0) {
+                    console.log('No posts available.'); // Log if there are no posts
+                    postsFeed.innerHTML = '<div class="no-posts">No posts available. Be the first to share something!</div>';
+                } else {
+                    console.log('Displaying posts...'); // Log before displaying posts
+                    data.posts.forEach(post => {
+                        const postElement = document.createElement('div');
+                        postElement.className = 'post';
+                        postElement.innerHTML = `
+                            <div class="post-header">
+                                <div class="post-user">
+                                    <span class="post-username">${post.username}</span>
+                                    <div class="post-timestamp">
+                                        <span class="post-date">${new Date(post.timestamp).toLocaleDateString()}</span>
+                                        <span class="post-time">${new Date(post.timestamp).toLocaleTimeString()}</span>
+                                    </div>
+                                </div>
+                                ${post.user_id === currentUserId ? 
+                                    `<button class="delete-post" data-post-id="${post.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>` : ''
+                                }
+                            </div>
+                            <div class="post-content">${post.content}</div>
+                        `;
+                        postsFeed.appendChild(postElement);
+                    });
 
-                       console.log('Posts displayed.'); // Log after displaying posts
+                    console.log('Posts displayed.'); // Log after displaying posts
 
-                       // Add event listeners to delete buttons
-                       document.querySelectorAll('.delete-post').forEach(button => {
-                           button.addEventListener('click', () => {
-                               const postId = button.getAttribute('data-post-id');
-                               deletePost(postId);
-                           });
-                       });
-                   }
-               }
-           })
-           .catch(error => {
-               console.error('Error fetching posts:', error);
-               postsFeed.innerHTML = '<div class="error">Failed to load posts. Please try again later.</div>';
-           })
-           .finally(() => {
-               console.log('Loading complete.'); // Log when loading is complete
-               loading.style.display = 'none'; // Hide loading indicator
-           });
-   }
+                    // Add event listeners to delete buttons
+                    document.querySelectorAll('.delete-post').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const postId = button.getAttribute('data-post-id');
+                            deletePost(postId);
+                        });
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching posts:', error);
+            postsFeed.innerHTML = '<div class="error">Failed to load posts. Please try again later.</div>';
+        })
+        .finally(() => {
+            console.log('Loading complete.'); // Log when loading is complete
+            loading.style.display = 'none'; // Hide loading indicator
+        });
+    }
 
    // Function to delete a post
    function deletePost(postId) {

@@ -121,14 +121,29 @@
                     </div>
                     <div class="post-action">📅 Event</div>
                     <div class="post-action">📝 Write Article</div>
-                    <button class="post-action" id="submitPost">Post</button> <!-- Submit button -->
+                    <button class="post-action" id="submitPost">Post</button> 
                 </div>
             </div>
             
             <!-- Posts Feed -->
             <div class="posts-feed" id="postsFeed">
                 <div id="loading" style="display: none;">Loading posts...</div>
-                <!-- Posts will be dynamically inserted here -->
+                <!-- Example Post Card  -->
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-user">
+                            <span class="post-username">Username</span>
+                            <div class="post-timestamp">
+                                <span class="post-date">Date</span>
+                                <span class="post-time">Time</span>
+                            </div>
+                        </div>
+                        <button class="delete-post" data-post-id="1">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="post-content">This is a sample post content.</div>
+                </div>
             </div>
 
 

@@ -207,6 +207,10 @@ body {
     color: var(--primary-color);
     transform: scale(1.1);
 }
+.nav-item a:hover{
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
 
 button {
     width: 100%;
@@ -447,12 +451,96 @@ button:hover {
     background: var(--hover-bg);
     border-radius: 1rem;
 }
+#submitPost{
+    width: 8rem;
+    display:flex;
+    justify-content:center;
+}
 
+/* Post Card Styling */
 .post {
-    border: 1px solid red; /* Temporary border for debugging */
-    margin-bottom: 10px;
-    padding: 10px;
-    background: white; /* Ensure posts are visible */
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.post-user {
+    display: flex;
+    flex-direction: row;
+    gap: 22rem;
+}
+
+.post-username {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    line-height:3.5rem;
+}
+
+.post-timestamp {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 1.4rem;
+}
+
+.post-date {
+    font-size: 0.8em;
+}
+
+.post-time {
+    font-size: 0.8em;
+}
+
+.post-content {
+    padding:10px;
+    border-radius:5px;
+    font-size: 1em;
+    color: var(--text-color);
+    line-height: 1.5;
+    background: rgba(128, 128, 128, 0.19);
+}
+
+.delete-post {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.delete-post:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+    transform: scale(1.2);
+}
+
+.delete-post i {
+    font-size: 14px;
 }
 
 /* Loading indicator */
@@ -757,6 +845,12 @@ button:hover {
         position: absolute;
         left: 1.8rem;
         right: 0rem;
+    }
+    .post {
+        width:35rem;
+    }
+    .post-user{
+        gap: 11rem;
     }
 }
 
