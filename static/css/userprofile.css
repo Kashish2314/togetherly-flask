@@ -110,19 +110,24 @@ body {
     height: 200px;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(45deg, #3A29FF, #FF94B4, #c022ff);
-    background-size: 300% 300%;
-    animation: aurora 5s infinite alternate ease-in-out;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 255, 150, 0.5), rgba(0, 0, 0, 0.9));
 }
-@keyframes aurora {
+/* Aurora effect */
+.aurora {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, #00ff96, #00a3ff, #000);
+    animation: moveAurora 6s infinite alternate ease-in-out;
+    filter: blur(80px);
+}
+
+@keyframes moveAurora {
     0% {
-        background-position: 0% 30% 50%;
+        transform: translate(-25%, -25%);
     }
     100% {
-        background-position: 100% 50%;
+        transform: translate(25%, 25%);
     }
 }
 
