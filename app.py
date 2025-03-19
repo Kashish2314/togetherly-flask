@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
@@ -28,8 +29,16 @@ class User(db.Model):
 class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=True)
+    username = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.String(500), nullable=True)
     skills = db.Column(db.String(500), nullable=True)
+    following = db.Column(db.Integer, default=0)
+    connections = db.Column(db.Integer, default=0)
+    projects = db.Column(db.Integer, default=0)
+    posts = db.Column(db.Integer, default=0)
+    profile_picture = db.Column(db.String(500), nullable=True)  # Store the file path or URL
 
     def __repr__(self):
         return f'<UserProfile {self.user_id}>'
@@ -115,33 +124,68 @@ def user_profile():
         flash('Please log in to view your profile.', 'error')
         return redirect(url_for('login'))
 
-    # Fetch the logged-in user's data
-    user = User.query.get(session['user_id'])
-    if not user:
-        flash('User not found.', 'error')
-        return redirect(url_for('home'))
+    try:
+        # Fetch the logged-in user's data
+        user = User.query.get(session['user_id'])
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('home'))
 
-    # Fetch the user's profile data
-    user_profile = UserProfile.query.filter_by(user_id=user.id).first()
+        # Fetch the user's profile data
+        user_profile = UserProfile.query.filter_by(user_id=user.id).first()
 
-    # Render the user profile page with the user's data
-    return render_template('userprofile.html', user=user, user_profile=user_profile)
+        # Log the user and profile data for debugging
+        app.logger.debug(f"User: {user}")
+        app.logger.debug(f"User Profile: {user_profile}")
+
+        # Render the user profile page with the user's data
+        return render_template('userprofile.html', user=user, user_profile=user_profile)
+    except Exception as e:
+        app.logger.error(f"Error in user_profile route: {e}")
+        return "An error occurred while loading the profile page.", 500
+
+# Configure upload folder and allowed extensions
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Route to Handle Profile Updates
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     if 'user_id' not in session:
-        flash('Please log in to update your profile.', 'error')
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Please log in to update your profile.'}), 401
 
     user = User.query.get(session['user_id'])
     if not user:
-        flash('User not found.', 'error')
-        return redirect(url_for('home'))
+        return jsonify({'success': False, 'message': 'User not found.'}), 404
 
     # Get form data
+    name = request.form.get('name')
+    username = request.form.get('username')
+    email = request.form.get('email')
     bio = request.form.get('bio')
     skills = request.form.get('skills')
+    following = request.form.get('following', type=int)
+    connections = request.form.get('connections', type=int)
+    projects = request.form.get('projects', type=int)
+    posts = request.form.get('posts', type=int)
+
+    # Handle profile picture upload
+    profile_picture = request.files.get('profile_picture')
+    profile_picture_path = None
+    if profile_picture and allowed_file(profile_picture.filename):
+        # Save the file to the upload folder
+        filename = secure_filename(f"user_{user.id}_{profile_picture.filename}")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        profile_picture.save(filepath)
+        profile_picture_path = os.path.join('uploads', filename)
 
     # Fetch or create the user's profile
     user_profile = UserProfile.query.filter_by(user_id=user.id).first()
@@ -150,12 +194,36 @@ def update_profile():
         db.session.add(user_profile)
 
     # Update profile data
+    user_profile.name = name
+    user_profile.username = username
+    user_profile.email = email
     user_profile.bio = bio
     user_profile.skills = skills
+    user_profile.following = following
+    user_profile.connections = connections
+    user_profile.projects = projects
+    user_profile.posts = posts
+    if profile_picture_path:
+        user_profile.profile_picture = profile_picture_path
+
     db.session.commit()
 
-    flash('Profile updated successfully!', 'success')
-    return redirect(url_for('user_profile'))
+    # Return a JSON response
+    return jsonify({
+        'success': True,
+        'message': 'Profile updated successfully!',
+        'name': name,
+        'username': username,
+        'email': email,
+        'bio': bio,
+        'skills': skills,
+        'following': following,
+        'connections': connections,
+        'projects': projects,
+        'posts': posts,
+        'profile_picture': profile_picture_path
+    })
+
 
 # Delete Profile Route
 @app.route('/delete_account', methods=['POST'])
