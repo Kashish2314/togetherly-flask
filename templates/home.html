@@ -104,7 +104,7 @@
             <div class="create-post">
                 <input type="hidden" id="createPostUrl" value="{{ url_for('create_post') }}">
                 <input type="hidden" id="getPostsUrl" value="{{ url_for('get_posts') }}">
-                <input type="hidden" id="currentUserId" value="{{ session.get('user_id', 0) }}"> <!-- Add this line -->
+                <input type="hidden" id="currentUserId" value="{{ session.get('user_id', 0) }}"> 
                 <div class="post-input">
                     <div class="post-avatar">
                         <i class="fas fa-user"></i>
