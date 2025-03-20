@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Configure SQLite database
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "database.db")}'
-app.config['SECRET_KEY'] = 'kashish1020'  # Required for session management
+app.config['SECRET_KEY'] = 'kashish1220'  # Required for session management
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
